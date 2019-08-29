@@ -104,6 +104,11 @@ class LazyImporter(object):
 
   @utils.classproperty
   @classmethod
+  def wand(cls):
+    return _try_import("wand")
+
+  @utils.classproperty
+  @classmethod
   def os(cls):
     """For testing purposes only."""
     return _try_import("os")

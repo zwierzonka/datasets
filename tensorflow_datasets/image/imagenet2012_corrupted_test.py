@@ -26,8 +26,8 @@ from tensorflow_datasets.image import imagenet2012_corrupted
 
 class Imagenet2012CorruptedTest(testing.DatasetBuilderTestCase):
   BUILDER_CONFIG_NAMES_TO_TEST = [  # pylint: disable=g-long-ternary
-      "defocus_blur_5", "elastic_2", "brightness_3", "zoom_blur_1",
-      "frosted_glass_blur_4"
+      "defocus_blur_5", "elastic_transform_2", "brightness_3", "frost_1",
+      "glass_blur_4"
   ] if six.PY2 else []  # TODO(rsepassi): Re-enable Py3 test (b/129964829)
 
   DATASET_CLASS = imagenet2012_corrupted.Imagenet2012Corrupted

@@ -87,6 +87,8 @@ DATASET_FILES = [
     'image/cbis_ddsm_patch_labels.txt',
     'image/dtd_key_attributes.txt',
     'image/food-101_classes.txt',
+    'image/frost*.png',
+    'image/frost*.jpg',
     'image/imagenet2012_labels.txt',
     'image/imagenet2012_validation_labels.txt',
     'image/open_images_classes_all.txt',
@@ -112,7 +114,8 @@ DATASET_EXTRAS = {
         # route to install OpenCV
         'opencv-python==3.4.0.14',
         'scikit-image',
-        'scipy'
+        'scipy',
+        'wand',
     ],
     'groove': ['pretty_midi', 'pydub'],
     'librispeech': ['pydub'],  # and ffmpeg installed

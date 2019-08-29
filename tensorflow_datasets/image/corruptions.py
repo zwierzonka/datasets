@@ -15,12 +15,11 @@
 
 """Common corruptions to images.
 
-Define 12+4 common image corruptions: Gaussian noise, shot noise, impulse_noise,
+Define 15+4 common image corruptions: Gaussian noise, shot noise, impulse_noise,
 defocus blur, frosted glass blur, zoom blur, fog, brightness, contrast, elastic,
-pixelate, jpeg compression.
+pixelate, jpeg compression, frost, snow, and motion blur.
 
-4 extra corruptions include gaussian blur, saturate, spatter, and speckle
-noise.
+4 extra corruptions: gaussian blur, saturate, spatterr, and speckle noise.
 """
 
 from __future__ import absolute_import
@@ -30,6 +29,11 @@ from __future__ import print_function
 import io
 import numpy as np
 import tensorflow_datasets.public_api as tfds
+
+_FROST_FNAMES = [
+    'image/frost1.png', 'image/frost2.png', 'image/frost3.png',
+    'image/frost4.jpg', 'image/frost5.jpg', 'image/frost6.jpg'
+]
 
 # /////////////// Corruption Helpers ///////////////
 
@@ -239,7 +243,7 @@ def defocus_blur(x, severity=1):
   return around_and_astype(x_clip)
 
 
-def frosted_glass_blur(x, severity=1):
+def glass_blur(x, severity=1):
   """Frosted glass blurring to images.
 
   Apply frosted glass blurring to images by shuffling pixels locally.
@@ -367,7 +371,7 @@ def contrast(x, severity=1):
   return around_and_astype(x_clip)
 
 
-def elastic(x, severity=1):
+def elastic_transform(x, severity=1):
   """Conduct elastic transform to images.
 
   Elastic transform is performed on small patches of the images.
@@ -469,6 +473,106 @@ def jpeg_compression(x, severity=1):
   return np.asarray(x)
 
 
+def frost(x, severity=1):
+  """Apply frost to images.
+
+  Args:
+    x: numpy array, uncorrupted image, assumed to have uint8 pixel in [0,255].
+    severity: integer, severity of corruption.
+
+  Returns:
+    numpy array, image with uint8 pixels in [0,255]. Applied frost.
+  """
+  c = [(1, 0.4), (0.8, 0.6), (0.7, 0.7), (0.65, 0.7), (0.6, 0.75)][severity - 1]
+  idx = np.random.randint(5)
+  filename = tfds.core.get_tfds_path(_FROST_FNAMES[idx])
+  frost_img = tfds.core.lazy_imports.cv2.imread(filename)
+  # randomly crop and convert to rgb
+  x_start, y_start = np.random.randint(
+      0, frost_img.shape[0] - 224), np.random.randint(0,
+                                                      frost_img.shape[1] - 224)
+  frost_img = frost_img[x_start:x_start + 224, y_start:y_start + 224][...,
+                                                                      [2, 1, 0]]
+
+  x = np.clip(c[0] * np.array(x) + c[1] * frost_img, 0, 255)
+
+  return around_and_astype(x)
+
+
+def snow(x, severity=1):
+  """Apply snow to images.
+
+  Args:
+    x: numpy array, uncorrupted image, assumed to have uint8 pixel in [0,255].
+    severity: integer, severity of corruption.
+
+  Returns:
+    numpy array, image with uint8 pixels in [0,255]. Applied snow.
+  """
+  cv2 = tfds.core.lazy_imports.cv2
+  c = [(0.1, 0.3, 3, 0.5, 10, 4, 0.8), (0.2, 0.3, 2, 0.5, 12, 4, 0.7),
+       (0.55, 0.3, 4, 0.9, 12, 8, 0.7), (0.55, 0.3, 4.5, 0.85, 12, 8, 0.65),
+       (0.55, 0.3, 2.5, 0.85, 12, 12, 0.55)][severity - 1]
+
+  x = np.array(x, dtype=np.float32) / 255.
+  snow_layer = np.random.normal(
+      size=x.shape[:2], loc=c[0], scale=c[1])  # [:2] for monochrome
+
+  snow_layer = clipped_zoom(snow_layer[..., np.newaxis], c[2])
+  snow_layer[snow_layer < c[3]] = 0
+
+  snow_layer = tfds.core.lazy_imports.PIL_Image.fromarray(
+      (np.clip(snow_layer.squeeze(), 0, 1) * 255).astype(np.uint8), mode='L')
+  output = io.BytesIO()
+  snow_layer.save(output, format='PNG')
+  snow_layer = tfds.core.lazy_imports.wand.image.Image(blob=output.getvalue())
+
+  snow_layer.motion_blur(
+      radius=c[4], sigma=c[5], angle=np.random.uniform(-135, -45))
+
+  snow_layer = cv2.imdecode(
+      np.fromstring(snow_layer.make_blob(), np.uint8),
+      cv2.IMREAD_UNCHANGED) / 255.
+  snow_layer = snow_layer[..., np.newaxis]
+
+  x = c[6] * x + (1 - c[6]) * np.maximum(
+      x,
+      cv2.cvtColor(x, cv2.COLOR_RGB2GRAY).reshape(224, 224, 1) * 1.5 + 0.5)
+  x = np.clip(x + snow_layer + np.rot90(snow_layer, k=2), 0, 1) * 255
+
+  return around_and_astype(x)
+
+
+def motion_blur(x, severity=1):
+  """Apply motion blur to images.
+
+  Args:
+    x: numpy array, uncorrupted image, assumed to have uint8 pixel in [0,255].
+    severity: integer, severity of corruption.
+
+  Returns:
+    numpy array, image with uint8 pixels in [0,255]. Applied motion blur.
+  """
+  c = [(10, 3), (15, 5), (15, 8), (15, 12), (20, 15)][severity - 1]
+
+  output = io.BytesIO()
+  x.save(output, format='PNG')
+  x = tfds.core.lazy_imports.wand.image.Image(blob=output.getvalue())
+
+  x.motion_blur(radius=c[0], sigma=c[1], angle=np.random.uniform(-45, 45))
+
+  x = tfds.core.lazy_imports.cv2.imdecode(
+      np.fromstring(x.make_blob(), np.uint8),
+      tfds.core.lazy_imports.cv2.IMREAD_UNCHANGED)
+
+  if x.shape != (224, 224):
+    x = np.clip(x[..., [2, 1, 0]], 0, 255)  # BGR to RGB
+  else:  # greyscale to RGB
+    x = np.clip(np.array([x, x, x]).transpose((1, 2, 0)), 0, 255)
+
+  return around_and_astype(x)
+
+
 # /////////////// Extra Corruptions ///////////////
 
 
@@ -543,7 +647,7 @@ def spatter(x, severity=1):
     #     ker = np.array([[-1,-2,-3],[-2,0,0],[-3,0,1]], dtype=np.float32)
     #     ker -= np.mean(ker)
     ker = np.array([[-2, -1, 0], [-1, 1, 1], [0, 1, 2]])
-    dist = cv2.filter2D(dist, cv2.CV_8U, ker)
+    dist = cv2.filter2D(dist, cv2.CVX_8U, ker)
     dist = cv2.blur(dist, (3, 3)).astype(np.float32)
 
     m = cv2.cvtColor(liquid_layer * dist, cv2.COLOR_GRAY2BGRA)
