@@ -549,6 +549,8 @@ https://dumps.wikimedia.your.org/plwiki/20190301/plwiki-20190301-pages-articles-
 https://dumps.wikimedia.your.org/plwiki/20190301/plwiki-20190301-pages-articles-multistream4.xml-p1056311p1831508.bz2 335096559 b1492c7af4e88f7176910e9605243c596c008b50e25815de767d443bffb1ed58
 https://dumps.wikimedia.your.org/plwiki/20190301/plwiki-20190301-pages-articles-multistream5.xml-p1831509p3070392.bz2 495842308 fa4aa93c84b2de1318bcbb8c147cf60b8acf807113a4460958bad2e7b20e2275
 https://dumps.wikimedia.your.org/plwiki/20190301/plwiki-20190301-pages-articles-multistream6.xml-p3070395p4479892.bz2 480118183 ad7469224aa91c7d4d9b07a4c3362d00cb99ca58eee1e35db1f4350c670ae424
+https://dumps.wikimedia.your.org/plwiki/20191101/dumpstatus.json 23086 7329db75e1543d890b9073cbf3d04309215908ad2c8eb5faf8e7113b8f638762
+https://dumps.wikimedia.your.org/plwiki/20191101/plwiki-20191101-pages-articles-multistream6.xml-p4570395p4649913.bz2 24844723 2c968fb9535541c1a63e12174e4789a15117a7ab4f1c12106404c6f138d95bed
 https://dumps.wikimedia.your.org/pmswiki/20190301/dumpstatus.json 10109 693836ad5f1bc501704f64790bd440fa52577a4165d97f8b9b744bbebef1640d
 https://dumps.wikimedia.your.org/pmswiki/20190301/pmswiki-20190301-pages-articles-multistream.xml.bz2 14063295 0a7c0588fb59a438f017ea57a8eb43aab32407dd01cd069aa71ea3b2d991a41b
 https://dumps.wikimedia.your.org/pnbwiki/20190301/dumpstatus.json 10109 465b0f94f05ab8f6d0f19ec6d670774e39ec6b004117e983ba4520fbbc5d5518

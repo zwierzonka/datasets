@@ -118,7 +118,7 @@ class Wikipedia(tfds.core.BeamBasedBuilder):
           version=tfds.core.Version(
               "0.0.3", experiments={tfds.core.Experiment.S3: False}),
           language=lang,
-          date="20190301",
+          date="20191101",
       ) for lang in WIKIPEDIA_LANGUAGES
   ]
 
