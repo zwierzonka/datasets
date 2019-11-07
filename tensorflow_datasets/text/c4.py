@@ -120,6 +120,7 @@ class C4(tfds.core.BeamBasedBuilder):
 
   BUILDER_CONFIGS = [
       C4Config(language="en", description="English C4 dataset."),
+      C4Config(language="pl", description="Polish C4 dataset."),
       C4Config(
           language="en",
           clean=False,
