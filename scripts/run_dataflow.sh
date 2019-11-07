@@ -4,6 +4,7 @@ if [[ "$#" -ne 1 ]]; then
     echo "Usage: scripts/run_dataflow.sh dataset_config"
     echo "Example: scripts/run_dataflow.sh wikipedia/20191101.pl"
     echo "Example: scripts/run_dataflow.sh c4/pl"
+    exit 0
 fi
 
 DATASET_NAME=$1
