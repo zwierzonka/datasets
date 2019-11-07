@@ -19,7 +19,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import codecs
 import json
 import math
 import re
@@ -177,6 +176,7 @@ class Wikipedia(tfds.core.BeamBasedBuilder):
 
   def _build_pcollection(self, pipeline, filepaths, language):
     """Build PCollection of examples in the raw (text) form."""
+    import codecs
 
     beam = tfds.core.lazy_imports.apache_beam
 
