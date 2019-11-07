@@ -5,7 +5,8 @@ GCP_PROJECT=sc-8395-kraken-prod
 GCP_BUCKET=gs://polish_language_model_data
 GCP_REGION=europe-west1
 
-JOB_NAME="${DATASET_NAME//[_\.\/]/-}"
+DT=`date +%Y-%m-%d-%H-%M-%S`
+JOB_NAME="${DATASET_NAME//[_\.\/]/-}-$DT"
 
 #echo "tensorflow_datasets[$DATASET_NAME]" > /tmp/beam_requirements.txt
 
